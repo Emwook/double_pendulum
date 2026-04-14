@@ -1,10 +1,10 @@
 from os.path import join as pjoin
 import numpy as np
 import matplotlib.pyplot as plt
+import torch as tr
 
-trial_num = 3
-
-def get_data():
+#loading the data in the torch tensor format
+def get_data(trial_num = 3):
     data_dir = pjoin('data', 'Video_Tracking_Data', f'Trial{trial_num}')
     theta1_deg = np.load(pjoin(data_dir, 'DPmean_data_RB0.npy')).flatten()
     theta2_deg = np.load(pjoin(data_dir, 'DPmean_data_RB1.npy')).flatten()
@@ -15,46 +15,41 @@ def get_data():
     min_len = min(len(theta1), len(theta2))
     theta1, theta2 = theta1[:min_len], theta2[:min_len]
 
-    L1, L2 = 0.5, 0.5
-    x1 = L1 * np.sin(theta1)
-    y1 = -L1 * np.cos(theta1)
+    numpy_data = np.column_stack([theta1, theta2])
 
-    x2 = x1 + L2 * np.sin(theta2)
-    y2 = y1 - L2 * np.cos(theta2)
+    tensor_data = tr.tensor(numpy_data, dtype=tr.float32)
+    return tensor_data
 
-    data = np.column_stack([theta1, theta2, x1, y1, x2, y2])
-    return data
-
-def get_velocity(data, dt=0.001):
-    velocity = (data[1:] - data[:-1])/(dt)
-    velocity = np.vstack([velocity, velocity[-1:]])
-    return velocity
 
 def plot_data(data):
     plt.figure(figsize=(12, 5))
+    th1, th2 = data[:,0], data[:,1]
+    L1, L2 = 0.2, 0.2
+    x1 = L1 * np.sin(th1)
+    y1 = -L1 * np.cos(th1)
+    x2 = x1 + L2 * np.sin(th2)
+    y2 = y1 - L2 * np.cos(th2)
 
+    plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
-    plt.plot(data[:,0], data[:,1], lw=0.5)
-    plt.title("Phase Space")
+    plt.plot(th1, th2, lw=0.5, color='purple')
+    plt.title("Phase Space (Radians)")
     plt.xlabel("Theta 1")
     plt.ylabel("Theta 2")
 
     plt.subplot(1, 2, 2)
-    plt.plot(data[:,2], data[:,3], lw=0.5, color='blue', label="Joint")
-    plt.plot(data[:,4], data[:,5], lw=0.5, color='red', alpha=0.5, label="Tip")
+    plt.plot(x1, y1, lw=0.7, color='blue', label="Joint (L1)")
+    plt.plot(x2, y2, lw=0.5, color='red', alpha=0.6, label="Tip (L2)")
     plt.axis('equal')
-    plt.title("Physical Trajectory")
+    plt.title("Physical Trajectory (Meters)")
     plt.legend()
 
     plt.tight_layout()
     plt.show()
 
-def main():
-    data = get_data()
-    velocity  = get_velocity(data)
-    plot_data(data)
-
-
-# if '__name__' == '_main_':
-
-main()
+def plot_source():
+    tensor_data = get_data()
+    plot_data(tensor_data.numpy())
+   
+    
+# plot_source()

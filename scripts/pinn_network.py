@@ -23,7 +23,7 @@ class PINN_Network(tr.nn.Module):
         self.W_out = tr.nn.Parameter(tr.randn(hidden_size, input_size))
         self.b_out = tr.nn.Parameter(tr.zeros(input_size))
 
-    def pinn_loss_function(theta_pred, theta_actual, x_window, dt, l, g, lambda_w):
+    def pinn_loss_function(self,theta_pred, theta_actual, x_window, dt, l, g, lambda_w, PINN = True):
         mse_loss = tr.mean((theta_pred - theta_actual)**2)
 
         #getting previous physical params by finite differences
@@ -38,15 +38,17 @@ class PINN_Network(tr.nn.Module):
         om1 = omega_pred[:,0]
         om2 = omega_pred[:,1]
         ep1 = epsilon_pred[:,0]
-        ep2 = epsilon_pred[:,0]
+        ep2 = epsilon_pred[:,1]
 
         #calculating the lagrangian based loss function
         L_1 = (4/3)*l*ep1 + (1/2)*l*ep2*tr.cos(th1-th2) + (1/2)*l*om2**2 * tr.sin(th1 - th2) + (3/2)* g * tr.sin(th1)
-        L_2 = (1/3)*l*om2 + (1/2)*l*ep1*tr.cos(th1-th2) - (1/2)*l*om1**2 * tr.sin(th1 - th2) + (1/2)* g * tr.sin(th2)
+        L_2 = (1/3)*l*ep2 + (1/2)*l*ep1*tr.cos(th1-th2) - (1/2)*l*om1**2 * tr.sin(th1 - th2) + (1/2)* g * tr.sin(th2)
 
         L = tr.mean(L_1**2) + tr.mean(L_2**2)
 
-        loss = mse_loss + lambda_w*L
+        loss = mse_loss
+        if(PINN == True):
+            loss += lambda_w*L
         return loss, mse_loss, L
     
     def forward(self, x_window):
