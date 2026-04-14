@@ -23,7 +23,7 @@ class PINN_Network(tr.nn.Module):
         self.W_out = tr.nn.Parameter(tr.randn(hidden_size, input_size))
         self.b_out = tr.nn.Parameter(tr.zeros(input_size))
 
-    def pinn_loss_function(self,theta_pred, theta_actual, x_window, dt, l, g, lambda_w, PINN = True):
+    def pinn_loss_function(self,theta_pred, theta_actual, x_window, dt, l, g, lambda_w):
         mse_loss = tr.mean((theta_pred - theta_actual)**2)
 
         #getting previous physical params by finite differences
@@ -44,11 +44,10 @@ class PINN_Network(tr.nn.Module):
         L_1 = (4/3)*l*ep1 + (1/2)*l*ep2*tr.cos(th1-th2) + (1/2)*l*om2**2 * tr.sin(th1 - th2) + (3/2)* g * tr.sin(th1)
         L_2 = (1/3)*l*ep2 + (1/2)*l*ep1*tr.cos(th1-th2) - (1/2)*l*om1**2 * tr.sin(th1 - th2) + (1/2)* g * tr.sin(th2)
 
-        L = tr.mean(L_1**2) + tr.mean(L_2**2)
+        L = (tr.mean(L_1**2) + tr.mean(L_2**2) )*(dt**4)
 
-        loss = mse_loss
-        if(PINN == True):
-            loss += lambda_w*L
+        loss = mse_loss + lambda_w*L
+        
         return loss, mse_loss, L
     
     def forward(self, x_window):

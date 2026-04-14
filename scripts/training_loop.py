@@ -24,9 +24,9 @@ def training_loop():
     dt = 0.001
     l = 0.2
     g = 9.81
-    lambda_w = 0
-    learning_rate = 0.01
-    epochs = 5
+    lambda_w = 0.05
+    learning_rate = 0.1
+    epochs = 10
 
     input_size  = 2
     hidden_size = 32
@@ -43,7 +43,7 @@ def training_loop():
             
             theta_pred = model(x_window)
             total_loss, mse, phys = model.pinn_loss_function(
-                theta_pred, y_actual, x_window, dt, l, g, lambda_w, True
+                theta_pred, y_actual, x_window, dt, l, g, lambda_w
             )
 
             total_loss.backward()
