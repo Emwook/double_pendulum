@@ -1,23 +1,11 @@
-from get_data import *
 import torch as tr
 
-# goal: implement gru cell
-# why: to use in gru network
-# how: use the definition found online 
-
-# the equations:
-#
 # GRU CELL
 # s = sigma function
 # z(t)  = s(W_z*x(t) + U_z*h(t-1) + b_z)
 # r(t)  = s(W_r*x(t) + U_r*h(t-1) + b_r)
 # h'(t) = tanh(U*r(t)*h(t-1) + W*x(t) + b_h')
 # h(t)  = (1-z(t))*h'(t) + h(t-1)*z(t)
-#
-# LOSS FUNCTION
-# Loss = MSE(theta_pred, theta_actual) + lambda*L
-# L = 1/3*l*theta_dd_2 + 1/2*l*theta_dd_1*cos(theta_1-theta_2) 
-#    - 1/2*l*theta^2_d_1*sin(theta_1 - theta_2) + 1/2g*sin(theta_2)
 
 #note:
 # @ - matmul (matrix)
