@@ -111,3 +111,6 @@ venv.bak/
 
 # PyCharm
 .idea
+
+
+results/pendulum_comparison_3.gif
