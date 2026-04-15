@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import torch as tr
 
 #loading the data in the torch tensor format
-def get_data(trial_num = 3):
+def get_data(trial_num = 3, stride = 1):
     data_dir = pjoin('data', 'Video_Tracking_Data', f'Trial{trial_num}')
     theta1_deg = np.load(pjoin(data_dir, 'DPmean_data_RB0.npy')).flatten()
     theta2_deg = np.load(pjoin(data_dir, 'DPmean_data_RB1.npy')).flatten()
@@ -16,6 +16,7 @@ def get_data(trial_num = 3):
     theta1, theta2 = theta1[:min_len], theta2[:min_len]
 
     numpy_data = np.column_stack([theta1, theta2])
+    numpy_data = numpy_data[::stride]
 
     tensor_data = tr.tensor(numpy_data, dtype=tr.float32)
     return tensor_data

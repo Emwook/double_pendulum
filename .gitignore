@@ -77,7 +77,6 @@ cython_debug/
 *.h5
 *.hdf5
 *.ckpt
-*.pth
 *.pt
 *.onnx
 *.pb
@@ -89,6 +88,7 @@ cython_debug/
 *.jar
 *.out
 *.parquet
+*.sldprt
 output/
 runs/
 logs/

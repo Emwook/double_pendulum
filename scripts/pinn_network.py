@@ -1,3 +1,4 @@
+import numpy as np
 import torch as tr
 from gru import Gru_Cell
 
@@ -24,7 +25,10 @@ class PINN_Network(tr.nn.Module):
         self.b_out = tr.nn.Parameter(tr.zeros(input_size))
 
     def pinn_loss_function(self,theta_pred, theta_actual, x_window, dt, l, g, lambda_w):
-        mse_loss = tr.mean((theta_pred - theta_actual)**2)
+        #account for the criclular symmetry of the system (0 -> 360 deg)
+        theta_diff = theta_pred - theta_actual
+        theta_diff = (theta_diff + np.pi) % (2 * np.pi) - np.pi
+        mse_loss = tr.mean((theta_diff)**2)
 
         #getting previous physical params by finite differences
         theta_t      = x_window[:, -1, :]
